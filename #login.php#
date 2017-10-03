@@ -1,0 +1,45 @@
+<?php
+	ini_set('display_errors', 'On');
+	error_reporting(E_ALL | E_STRICT);
+
+	$ini_arr = parse_ini_file("amqpCreate.ini");
+	$url = $ini_arr['URL'];
+	//echo $url;
+	
+	//var_dump($_POST);
+
+	if (!isset($_POST))
+	{
+		$msg = "Empty Form Submitted";
+		echo json_encode($msg);
+		exit(0);
+	}
+	
+	//$credentials = array($_POST);
+	$credentials = json_encode($_POST);
+
+	//echo  $credentials;
+
+	$ch = curl_init($url);
+	curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+	curl_setopt($ch, CURLOPT_POSTFIELDS, $credentials);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+	curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+	    'Content-Type: application/json',
+	        'Content-Length: ' . strlen($credentials))
+		);
+
+
+	$output = curl_exec($ch);
+
+	// echo curl_getinfo($ch) . '<br/>';
+	//echo curl_errno($ch) . '<br/>';
+	//echo curl_error($ch) . '<br/>';
+	
+	curl_close($ch);
+
+	echo "Output: " . $output . "<br />";
+	
+	
+?>
