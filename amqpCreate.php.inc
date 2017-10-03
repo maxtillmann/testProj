@@ -17,11 +17,9 @@
 	$channel->close();
 	$connection->close();
 
+	
 	//$data = file_get_contents("php://input");
 	//echo json_decode($data);
 	//echo file_get_contents("php://input");
-	
-	
-	
 	
 ?>
