@@ -23,15 +23,43 @@ class amqpCreate
 	       }
 
 	}
-	
+
 	public function amqpSend($qname,$msg){
 	       $this->channel = $this->connection->channel();
-	       $this->channel->queue_declare($qname, false, false, false, false);
+	       $this->channel->queue_declare($qname,false,false,false,false);
+
 	       $this->msg = new AMQPMessage($msg);
-	       $this->channel->basic_publish($this->msg, '', $qname);
-	       //echo " [x] Sent " . $msg . "\n";
+
+	       $this->channel->basic_publish($this->msg,'',$qname);
+	       echo "[x] Sent", $msg, "\n";
 	       $this->channel->close();
 	       $this->connection->close();
+	}
+	
+	public function amqpRecieve($qname){
+	       $this->channel = $this->connection->channel();
+	       $this->channel->queue_declare($qname,false,false,false,false);
+
+	       echo ' [*] Waiting for Messages. To exit press CTRL+C', "\n";
+
+	       
+	       $callback = function($msg){
+	       		 echo "[x] Recieved ". $msg->body, "\n";		      return $msg;
+	       };
+
+	       $this->channel->basic_consume($qname,'',false,true,false,false,$callback);
+	  /*
+		while(count($this->channel->callbacks)){
+			$this->channel->wait();
+	  	}
+	  */
+		$this->channel->wait();
+	     	$result = $this->channel->callbacks;
+
+	       	$this->channel->close();
+	       	$this->connection->close();
+		return $result;
+
 	}
 }
 ?>

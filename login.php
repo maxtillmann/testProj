@@ -23,9 +23,9 @@ use PhpAmqpLib\Message\AMQPMessage;
 	
 
 	$amqp = new amqpCreate();
-	$amqp->amqpConstruct($hostinfo['HOST'],$hostinfo['PORT'],$hostinfo['USER'],$hostinfo['PASS']);
 	
-
+	$amqp->amqpConstruct($hostinfo['HOST'],$hostinfo['PORT'],$hostinfo['USER'],$hostinfo['PASS']);	
+	
 	$amqp->amqpSend($qname,$credentials);
 		
 ?>
