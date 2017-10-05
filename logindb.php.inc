@@ -49,6 +49,40 @@ class loginDB
 		       
 	     }
 	}
+	public function getUsername($name)
+        {
+	$un = $this->logindb->real_escape_string($name);
+	$query = "select screenname from users where screenname = '$name';";
+	$result = $this->logindb->query($query);
+	if (!$result)
+	{
+            echo "this username does not exist!".PHP_EOL;
+            return 0;
+	}
+	
+	$user = $result->fetch_assoc();
+	if (isset($user['screenname']))
+	{
+            return $user['screenname'];
+	}
+	return 0;
+    }
+    public function addNewUser($name, $password)
+    {
+            if($this->getUsername($name) == true)
+            {
+                echo "user $name already exists!".PHP_EOL;
+                return false;
+            }
+            $addQuery = "insert into users (screenname, password) values ('$name', '$password');";
+            $results = $this->logindb->query($addQuery);
+            echo "user $name created";
+            
+            if (!$results)
+            {
+            echo "error: ".$this->logindb->error.PHP.EOL;
+            }
+    }
 }
 
 ?>
