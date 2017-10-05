@@ -16,7 +16,8 @@ use PhpAmqpLib\Message\AMQPMessage;
 		exit(0);
 	}
 
-	$qname = $_POST["type"];
+	//$qname = $_POST["type"];
+	$qname = "Login";
 	//var_dump($_POST);
 	$credentials = json_encode($_POST);
 	$hostinfo = parse_ini_file("amqpCreate.ini");
@@ -25,7 +26,22 @@ use PhpAmqpLib\Message\AMQPMessage;
 	$amqp = new amqpCreate();
 	
 	$amqp->amqpConstruct($hostinfo['HOST'],$hostinfo['PORT'],$hostinfo['USER'],$hostinfo['PASS']);	
+
+	$result = $amqp->amqpSend($qname,$credentials);
+
+
+	if($result == 1){
+		   echo "Login Authenticated", "\n";
+        }
+
+	elseif($result == -1){
+		echo "Login Failed, Invalid Username or Pass", "\n";	
+	}
 	
-	$amqp->amqpSend($qname,$credentials);
-		
+	elseif($result == 2){
+		echo "Sucessfully Registered", "\n";	
+	}
+	else{
+		echo "Failed to Register", "\n";	
+	}
 ?>

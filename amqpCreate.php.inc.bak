@@ -1,0 +1,64 @@
+<?php
+ini_set('display_errors', 'On');
+error_reporting(E_ALL | E_STRICT);
+
+require_once __DIR__ . '/vendor/autoload.php';
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Message\AMQPMessage;
+
+class amqpCreate
+{
+	private $connection;
+	private $channel;
+	
+	public function amqpConstruct($hostip,$port,$user,$pass){
+	       $this->connection = new AMQPStreamConnection($hostip,$port,$user,$pass);
+	       $this->channel = $this->connection->channel();
+	       
+	       if($this->connection){
+			echo "Established a connection to the broker\n";
+	       }
+	       else{
+			echo "Connect Connect to broker\n";
+	       }
+
+	       list($this->callback_queue, ,) = $this->channel->queue_declare(
+	               "", false, false, true, false);
+	       $this->channel->basic_consume(
+			$this->callback_queue, '',false,false,false,false,
+			array($this, 'on_response'));
+
+	}
+
+	public function amqpSend($qname,$msg){
+	       $this->channel->queue_declare($qname,false,false,false,false);
+
+	       $this->msg = new AMQPMessage($msg);
+
+	       $this->channel->basic_publish($this->msg,'',$qname);
+	       echo "[x] Sent", $msg, "\n";
+	       $this->channel->close();
+	       $this->connection->close();
+	}
+	
+	public function amqpRecieve($qname){
+	       $this->channel->queue_declare($qname,false,false,false,false);
+
+	       echo ' [*] Waiting for Messages. To exit press CTRL+C', "\n";
+
+	       
+	       $callback = function($msg){
+	       		 $this->loginR = $msg->body; 
+	       		 //echo "[x] Recieved ". $msg->body, "\n";	
+	       };
+
+	       $this->channel->basic_consume($qname,'',false,true,false,false,$callback);
+	 
+		$this->channel->wait();
+	     	$result = $this->channel->callbacks;
+
+	       	$this->channel->close();
+	       	$this->connection->close();
+	}
+}
+?>
