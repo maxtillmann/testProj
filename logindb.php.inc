@@ -76,7 +76,7 @@ class loginDB
             }
             $addQuery = "insert into users (screenname, password) values ('$name', '$password');";
             $results = $this->logindb->query($addQuery);
-            echo "user $name created";
+            echo "user $name created".PHP.EOL;
             
             if (!$results)
             {
